@@ -6,6 +6,7 @@ import models.Categorie;
 import models.Projet;
 
 import java.sql.*;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,32 +15,42 @@ public class Main {
             CategorieService categorieService = new CategorieService();
             ProjetService projetService = new ProjetService();
 
-            // Fetch a category by ID (example: ID = 1)
-            int categorieId = 1;
-            Categorie categorie = categorieService.getCategorieById(categorieId);
+            // Add a new category
+            Categorie newCategorie = new Categorie(0, "Software Development");
+            categorieService.addCategorie(newCategorie);
 
-            if (categorie != null) {
-                // Add a new project with the fetched category
-                Projet projet = new Projet("E-commerce App", "Online shopping platform", "Java, Spring Boot", categorie);
-                projetService.addProjet(projet);
-
-                // Retrieve and print all projects
-                ResultSet projets = projetService.getAllProjets();
-                while (projets.next()) {
-                    System.out.println("Project ID: " + projets.getInt("idProjet") + ", Name: " + projets.getString("nom") +
-                            ", Description: " + projets.getString("description") + ", Technologies: " + projets.getString("technologie"));
-                }
-
-
-
-                // Update a project
-                projetService.updateProjet(1, "Updated E-commerce App", "Updated Description", "Java, Angular", categorie);
-
-                // Delete a project
-                projetService.deleteProjet(1);
-            } else {
-                System.out.println("Category not found!");
+            // Fetch and print all categories
+            List<Categorie> categories = categorieService.getAllCategories();
+            for (Categorie categorie : categories) {
+                System.out.println("Category ID: " + categorie.getIdCateg() + ", Name: " + categorie.getNom());
             }
+
+            // Add a new project with the fetched category (assuming the category with ID 1 exists)
+            Categorie existingCategorie = categorieService.getCategorieById(1); // Example category ID 1
+            if (existingCategorie != null) {
+                Projet newProjet = new Projet("E-commerce Platform", "Online shopping system", "Java, Spring Boot", existingCategorie);
+                projetService.addProjet(newProjet);
+            }
+
+            // Fetch and print all projects
+            ResultSet projets = projetService.getAllProjets();
+            while (projets.next()) {
+                System.out.println("Project ID: " + projets.getInt("idProjet") + ", Name: " + projets.getString("nom") +
+                        ", Description: " + projets.getString("description") + ", Technologies: " + projets.getString("technologie"));
+            }
+
+            // Update a project (example: Update project with ID 1)
+            projetService.updateProjet(1, "Updated E-commerce Platform", "Updated description", "Java, React", existingCategorie);
+
+            // Delete a project (example: Delete project with ID 1)
+            projetService.deleteProjet(1);
+
+            // Update a category
+            categorieService.updateCategorie(1, "Updated Software Development");
+
+            // Delete a category
+            categorieService.deleteCategorie(2);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
